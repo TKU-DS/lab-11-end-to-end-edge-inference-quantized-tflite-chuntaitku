@@ -1,0 +1,18 @@
+# Python bytecode
+__pycache__/
+*.py[cod]
+
+# Virtual environment
+venv/
+.env
+
+# Model & Data Files (Do not commit models or test images!)
+*.jpg
+*.jpeg
+*.png
+*.tflite
+*.zip
+labels*.txt
+
+# OS files
+.DS_Store

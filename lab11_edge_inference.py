@@ -59,10 +59,12 @@ if __name__ == "__main__":
     # 2. Allocate tensors (allocate_tensors()).
     # 3. Get input and output details (get_input_details(), get_output_details()).
     # ---------------------------------------------------------
-    # interpreter = ...
+    interpreter = tflite.Interpreter(model_path=model_path)
     
-    input_details = [{'index': 0}]   # Placeholder, remove this
-    output_details = [{'index': 0}]  # Placeholder, remove this
+    interpreter.allocate_tensors()
+    
+    input_details = interpreter.get_input_details()
+    output_details = interpreter.get_output_details()
     
     print(f"[*] Model Loaded: {model_path}")
 
@@ -85,8 +87,13 @@ if __name__ == "__main__":
     # DO NOT cast to float32. Keep the data type as uint8!
     # ---------------------------------------------------------
     # input_data = ...
+    resized = cv2.resize(image, (224, 224), interpolation=cv2.INTER_LINEAR)
     
-    input_data = np.zeros((1, 224, 224, 3), dtype=np.uint8) # Placeholder
+    rgb_image = resized[:, :, ::-1]
+    
+    input_data = np.expand_dims(rgb_image, axis=0)
+    
+    input_data = input_data.astype(np.uint8)
     
     t_pre = (time.perf_counter() - t0) * 1000
 
@@ -104,8 +111,11 @@ if __name__ == "__main__":
     # interpreter.set_tensor(input_details[0]['index'], input_data)
     # ...
     # output_data = ...
+    interpreter.set_tensor(input_details[0]['index'], input_data)
     
-    output_data = np.zeros((1, 1001)) # Placeholder
+    interpreter.invoke()
+    
+    output_data = interpreter.get_tensor(output_details[0]['index'])
     
     t_inf = (time.perf_counter() - t1) * 1000
     
